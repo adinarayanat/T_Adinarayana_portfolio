@@ -1,72 +1,86 @@
 import React from "react";
-import "../CSS/Portfoliosections.css";
+import "../CSS/Education.css";
+import { education, certifications } from "../data/profile";
+import Reveal from "./Reveal";
+import SectionHeader from "./SectionHeader";
+import { ArrowUpRightIcon, AwardIcon, GraduationIcon } from "./Icons";
 
-const Education = ({ isVisible }) => {
-  const education = [
-    {
-      degree: "Bachelor of Computer Applications (BCA)",
-      institution: "East Point College, Bangalore",
-      period: "2019 - 2022",
-      description:
-        "Comprehensive computer science education focusing on software development, programming languages, database management, and web technologies. Built strong foundation in Java, data structures, and software engineering principles.",
-    },
-    {
-      degree: "Pre-University Course (CEBA)",
-      institution: "Government PU College, Hoskote",
-      period: "2017 - 2019",
-      description:
-        "Strong foundation in Commerce, Economics, Business Studies, and Accountancy, developing analytical and business acumen skills.",
-    },
-  ];
+const Education = () => {
+  const hasCerts = certifications.length > 0;
 
   return (
-    <div className={`section-content ${isVisible ? "animate-fadeInUp" : ""}`}>
-      <div className="section-intro">
-        <h3 className="section-title">Academic Background</h3>
-        <p className="section-subtitle">
-          Building a strong foundation in computer science and business
-        </p>
-      </div>
+    <section id="education" className="section section--alt bg-grain" aria-labelledby="education-title">
+      <div className="container">
+        <SectionHeader
+          id="education-title"
+          eyebrow="Learning"
+          title={hasCerts ? "Education &" : "Academic"}
+          highlight={hasCerts ? "Certifications" : "Background"}
+          description="The academic foundation behind my work in software engineering."
+        />
 
-      <div className="section-grid section-grid-2">
-        {education.map((edu, index) => (
-          <div key={index} className="education-card card">
-            <div className="card-header">
-              <div className="card-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 14L21 9L12 4L3 9L12 14Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M12 14L12 22"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M6.5 11.5V16.5C6.5 16.5 8 19 12 19C16 19 17.5 16.5 17.5 16.5V11.5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <span className="card-badge">{edu.period}</span>
+        <div className={`edu-layout ${hasCerts ? "" : "edu-layout--solo"}`}>
+          <div className="edu-column">
+            {hasCerts && (
+              <h3 className="subheading subheading--icon">
+                <GraduationIcon size={18} /> Education
+              </h3>
+            )}
+            <div className="edu-list">
+              {education.map((edu, index) => (
+                <Reveal as="article" key={edu.degree} className="edu-card card" delay={index * 80}>
+                  <div className="edu-card__top">
+                    <span className="edu-card__icon" aria-hidden="true">
+                      <GraduationIcon size={20} />
+                    </span>
+                    <span className="badge">{edu.period}</span>
+                  </div>
+                  <h4 className="edu-card__title">{edu.degree}</h4>
+                  <p className="edu-card__place">{edu.institution}</p>
+                  <p className="edu-card__desc">{edu.description}</p>
+                </Reveal>
+              ))}
             </div>
-
-            <h4 className="card-title">{edu.degree}</h4>
-            <p className="card-institution">{edu.institution}</p>
-
-            <p className="card-description">{edu.description}</p>
           </div>
-        ))}
+
+          {hasCerts && (
+            <div className="edu-column">
+              <h3 className="subheading subheading--icon">
+                <AwardIcon size={18} /> Certifications
+              </h3>
+              <div className="cert-grid">
+                {certifications.map((cert, index) => (
+                  <Reveal as="article" key={cert.title} className="cert-card card" delay={index * 80}>
+                    <a
+                      href={cert.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="cert-card__link"
+                      aria-label={`View ${cert.title} credential (opens in a new tab)`}
+                    >
+                      {cert.image && (
+                        <div className="cert-card__thumb">
+                          <img src={cert.image} alt="" loading="lazy" decoding="async" />
+                        </div>
+                      )}
+                      <div className="cert-card__body">
+                        <p className="cert-card__issuer">
+                          {cert.issuer} <span aria-hidden="true">·</span> {cert.date}
+                        </p>
+                        <h4 className="cert-card__title">{cert.title}</h4>
+                        <span className="cert-card__cta">
+                          View credential <ArrowUpRightIcon size={14} />
+                        </span>
+                      </div>
+                    </a>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

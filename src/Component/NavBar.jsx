@@ -1,182 +1,94 @@
-// import React, { useState } from "react";
-
-// const NavBar = ({
-//   scrollToHero,
-//   scrollToAbout,
-//   scrollToPortfolio,
-//   scrollToContact,
-//   activeNav,
-// }) => {
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   const toggleMenu = () => {
-//     setIsOpen(!isOpen);
-//   };
-
-//   const handleScroll = (scrollFn, section) => {
-//     scrollFn();
-//     setIsOpen(false);
-//   };
-
-//   return (
-//     <>
-//       <style>
-//         {`
-//           .text-gradient-pink-purple {
-//             background: linear-gradient(to right, #ec4899, #7e22ce);
-//             -webkit-background-clip: text;
-//             background-clip: text;
-//             color: transparent;
-//             text-shadow: 2px 2px 4px rgba(75, 0, 130, 0.3);
-//           }
-//           .nav-link {
-//             transition: color 0.3s ease;
-//           }
-//           .nav-link:hover {
-//             color: #93c5fd;
-//           }
-//           .nav-link.active {
-//             color: #ec4899;
-//             font-weight: bold;
-//           }
-//           @media (max-width: 640px) {
-//             .text-2xl { font-size: 1.5rem; }
-//             .text-lg { font-size: 1rem; }
-//             .p-4 { padding: 1rem; }
-//           }
-//         `}
-//       </style>
-//       <nav className="fixed top-0 left-0 w-full bg-gray-900 text-white shadow-md z-50">
-//         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-//           <div className="text-2xl font-bold">
-//             <button
-//               onClick={() => handleScroll(scrollToHero, "Home")}
-//               className="text-gradient-pink-purple"
-//             >
-//               Rashmi Umesh
-//             </button>
-//           </div>
-
-//           <button
-//             className="sm:hidden flex flex-col gap-1.5"
-//             onClick={toggleMenu}
-//             aria-label="Toggle navigation menu"
-//           >
-//             <span
-//               className={`w-6 h-0.5 bg-white transition-transform duration-300 ${isOpen ? "rotate-45 translate-y-2" : ""}`}
-//             ></span>
-//             <span
-//               className={`w-6 h-0.5 bg-white transition-opacity duration-300 ${isOpen ? "opacity-0" : ""}`}
-//             ></span>
-//             <span
-//               className={`w-6 h-0.5 bg-white transition-transform duration-300 ${isOpen ? "-rotate-45 -translate-y-2" : ""}`}
-//             ></span>
-//           </button>
-
-//           <div
-//             className={`${isOpen ? "flex" : "hidden"} sm:flex flex-col sm:flex-row absolute sm:static top-12 left-0 w-full sm:w-auto bg-gray-900 sm:bg-transparent p-4 sm:p-0 text-center sm:text-left gap-4 sm:gap-8 text-lg`}
-//           >
-//             {[
-//               { name: "Home", scrollFn: scrollToHero },
-//               { name: "About", scrollFn: scrollToAbout },
-//               { name: "Portfolio", scrollFn: scrollToPortfolio },
-//               { name: "Contact", scrollFn: scrollToContact },
-//             ].map((item) => (
-//               <button
-//                 key={item.name}
-//                 className={`nav-link py-2 sm:py-0 ${activeNav === item.name ? "active" : ""}`}
-//                 onClick={() => handleScroll(item.scrollFn, item.name)}
-//               >
-//                 {item.name}
-//               </button>
-//             ))}
-//           </div>
-//         </div>
-//       </nav>
-//     </>
-//   );
-// };
-
-// export default NavBar;
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../CSS/NavBar.css";
+import { navItems, profile, links } from "../data/profile";
+import useActiveSection from "../hooks/useActiveSection";
+import { FileIcon } from "./Icons";
 
-const NavBar = ({ activeNav, setActiveNav }) => {
+const sectionIds = navItems.map((item) => item.id);
+
+const NavBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const active = useActiveSection(sectionIds);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const scrollToSection = (sectionId, navName) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      const yOffset = -80;
-      const y =
-        section.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-      setActiveNav(navName);
-      setIsMobileMenuOpen(false);
-    }
-  };
-
-  const navItems = [
-    { name: "Home", id: "hero" },
-    { name: "About", id: "about" },
-    { name: "Portfolio", id: "portfolio" },
-    { name: "Contact", id: "contact" },
-  ];
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKey = (e) => e.key === "Escape" && setIsOpen(false);
+    const onResize = () => window.innerWidth > 960 && setIsOpen(false);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [isOpen]);
 
   return (
-    <nav className={`navbar ${isScrolled ? "navbar-scrolled" : ""}`}>
-      <div className="navbar-container">
-        <button
-          className="navbar-logo"
-          onClick={() => scrollToSection("hero", "Home")}
-        >
-          {" "}
-          <span className="logo-dot"></span>
-          <span className="logo-text">T Adinarayana</span>
-          <span className="logo-dot"></span>
-        </button>
+    <header className={`navbar ${isScrolled || isOpen ? "navbar--scrolled" : ""}`}>
+      <nav className="navbar__inner container" aria-label="Primary">
+        <a href="#hero" className="navbar__logo" onClick={() => setIsOpen(false)}>
+          <span className="decorative-dot" aria-hidden="true"></span>
+          <span className="navbar__logo-text">{profile.name}</span>
+        </a>
 
-        <div
-          className={`navbar-menu ${isMobileMenuOpen ? "navbar-menu-open" : ""}`}
+        <ul
+          id="primary-menu"
+          className={`navbar__menu ${isOpen ? "navbar__menu--open" : ""}`}
         >
-          {navItems.map((item, index) => (
-            <button
-              key={item.name}
-              className={`navbar-link ${activeNav === item.name ? "navbar-link-active" : ""}`}
-              onClick={() => scrollToSection(item.id, item.name)}
-            >
-              {item.name}
-            </button>
+          {navItems.map((item) => (
+            <li key={item.id}>
+              <a
+                href={`#${item.id}`}
+                className={`navbar__link ${active === item.id ? "is-active" : ""}`}
+                aria-current={active === item.id ? "true" : undefined}
+                onClick={() => setIsOpen(false)}
+              >
+                {item.label}
+              </a>
+            </li>
           ))}
-        </div>
+          <li className="navbar__menu-cta">
+            <a
+              href={links.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-sm"
+            >
+              <FileIcon size={16} /> Resume
+            </a>
+          </li>
+        </ul>
+
+        <a
+          href={links.resume}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-outline btn-sm navbar__cta"
+        >
+          <FileIcon size={16} /> Resume
+        </a>
 
         <button
-          className="navbar-hamburger"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
+          type="button"
+          className={`navbar__toggle ${isOpen ? "is-open" : ""}`}
+          aria-label={isOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isOpen}
+          aria-controls="primary-menu"
+          onClick={() => setIsOpen((open) => !open)}
         >
-          <span
-            className={`hamburger-line ${isMobileMenuOpen ? "hamburger-line-1" : ""}`}
-          ></span>
-          <span
-            className={`hamburger-line ${isMobileMenuOpen ? "hamburger-line-2" : ""}`}
-          ></span>
-          <span
-            className={`hamburger-line ${isMobileMenuOpen ? "hamburger-line-3" : ""}`}
-          ></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 

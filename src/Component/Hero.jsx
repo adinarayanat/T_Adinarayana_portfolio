@@ -1,123 +1,143 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import "../CSS/Hero.css";
+import { profile, links } from "../data/profile";
+import {
+  ArrowRightIcon,
+  FileIcon,
+  GitHubIcon,
+  LinkedInIcon,
+  MailIcon,
+  MapPinIcon,
+} from "./Icons";
 
-const Hero = ({ setActiveNav }) => {
-  const heroRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-        if (entry.isIntersecting) {
-          setActiveNav("Home");
-        }
-      },
-      { threshold: 0.5 },
-    );
-
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
-    }
-
-    return () => {
-      if (heroRef.current) {
-        observer.unobserve(heroRef.current);
-      }
-    };
-  }, [setActiveNav]);
-
-  const scrollToAbout = () => {
-    const aboutSection = document.getElementById("about");
-    if (aboutSection) {
-      const yOffset = -80;
-      const y =
-        aboutSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-    }
-  };
+const Hero = () => {
+  const socials = [
+    { label: "LinkedIn", href: links.linkedin, Icon: LinkedInIcon, external: true },
+    { label: "GitHub", href: links.github, Icon: GitHubIcon, external: true },
+    { label: "Email", href: `mailto:${links.email}`, Icon: MailIcon },
+  ];
 
   return (
-    <section id="hero" ref={heroRef} className="hero-section">
-      <div className="hero-background">
-        <div className="hero-gradient-orb hero-orb-1"></div>
-        <div className="hero-gradient-orb hero-orb-2"></div>
-        <div className="hero-gradient-orb hero-orb-3"></div>
+    <section id="hero" className="hero bg-grain" aria-labelledby="hero-title">
+      <div className="hero__backdrop" aria-hidden="true">
+        <div className="hero__orb hero__orb--1"></div>
+        <div className="hero__orb hero__orb--2"></div>
+        <div className="hero__grid"></div>
       </div>
 
-      <div className="hero-content ">
-        <div
-          className={`hero-text mt-14 md:mt-4 ${isVisible ? "animate-fadeInUp" : ""}`}
-        >
-          <span className="hero-greeting">Hello, I'm</span>
-
-          <h1 className="hero-title">
-            <span className="hero-name gradient-text">T Adinarayana</span>
-          </h1>
-
-          <div className="hero-subtitle-wrapper">
-            <span className="decorative-line"></span>
-            <h2 className="hero-subtitle">Java Full Stack Developer</h2>
-            <span className="decorative-line"></span>
-          </div>
-
-          <p
-            className={`hero-description ${isVisible ? "animate-fadeInUp stagger-2" : ""}`}
-          >
-            Building scalable enterprise applications with Spring Boot microservices, 
-            Apache Kafka, and React.js. 3 years of experience architecting robust, 
-            event-driven solutions with full-stack observability and cloud deployment.
+      <div className="container hero__layout">
+        <div className="hero__text">
+          <p className="hero__status hero-in" style={{ "--i": 0 }}>
+            <span className="status-dot" aria-hidden="true"></span>
+            {profile.current.role} at {profile.current.company}
           </p>
 
-          <div
-            className={`hero-cta ${isVisible ? "animate-fadeInUp stagger-3" : ""}`}
-          >
-            <button className="btn btn-primary" onClick={scrollToAbout}>
-              <span>Explore My Work </span>
-            </button>
+          <p className="hero__greeting hero-in" style={{ "--i": 1 }}>
+            Hello, I'm
+          </p>
+          <h1 id="hero-title" className="hero__name hero-in" style={{ "--i": 1 }}>
+            <span className="gradient-text">{profile.name}</span>
+          </h1>
 
-            <a href="#contact" className="btn btn-outline">
+          <div className="hero__role hero-in" style={{ "--i": 2 }}>
+            <span className="decorative-line" aria-hidden="true"></span>
+            <span>{profile.role}</span>
+          </div>
+
+          <p className="hero__intro hero-in" style={{ "--i": 3 }}>
+            {profile.intro}
+          </p>
+
+          <div className="hero__actions hero-in" style={{ "--i": 4 }}>
+            <a href="#projects" className="btn btn-primary">
+              View Projects <ArrowRightIcon size={18} />
+            </a>
+            <a
+              href={links.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline"
+            >
+              <FileIcon size={18} /> View Resume
+            </a>
+            <a href="#contact" className="btn btn-ghost">
               Get In Touch
             </a>
           </div>
 
-          <div
-            className={`hero-stats ${isVisible ? "animate-fadeInUp stagger-4" : ""}`}
-          >
-            <div className="hero-stat">
-              <span className="stat-number gradient-text">3+</span>
-              <span className="stat-label">Years Experience</span>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="hero-stat">
-              <span className="stat-number gradient-text">3+</span>
-              <span className="stat-label">Projects Delivered</span>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="hero-stat">
-              <span className="stat-number gradient-text">100%</span>
-              <span className="stat-label">Client Satisfaction</span>
-            </div>
-          </div>
+          <ul className="hero__socials hero-in" style={{ "--i": 5 }}>
+            {socials.map(({ label, href, Icon, external }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  className="icon-btn"
+                  aria-label={label}
+                  title={label}
+                  {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+                >
+                  <Icon size={18} />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div
-          className={`hero-scroll-indicator ${isVisible ? "animate-fadeInUp stagger-5" : ""}`}
-        >
-          <span className="scroll-text">Scroll to explore</span>
-          <div className="scroll-arrow">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 5V19M12 19L5 12M12 19L19 12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+        <aside className="hero__card hero-in" style={{ "--i": 3 }} aria-label="Profile summary">
+          <div className="hero__card-head">
+            <img
+              src={profile.photo}
+              alt=""
+              width="56"
+              height="56"
+              className="hero__avatar"
+            />
+            <div>
+              <p className="hero__card-name">{profile.fullName}</p>
+              <p className="hero__card-role">{profile.title}</p>
+            </div>
           </div>
-        </div>
+
+          <dl className="hero__card-meta">
+            <div>
+              <dt>Currently</dt>
+              <dd>
+                {profile.current.company}
+                <span> · since {profile.current.since}</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Location</dt>
+              <dd>
+                <MapPinIcon size={14} /> {profile.location}
+              </dd>
+            </div>
+          </dl>
+
+          <div className="hero__card-stack">
+            <p className="hero__card-label">Primary stack</p>
+            <ul className="chip-list">
+              {profile.focus.map((tech) => (
+                <li key={tech} className="chip">
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <ul className="hero__stats">
+            {profile.stats.map((stat) => (
+              <li key={stat.label}>
+                <span className="hero__stat-value gradient-text">{stat.value}</span>
+                <span className="hero__stat-label">{stat.label}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
       </div>
+
+      <a href="#about" className="hero__scroll" aria-label="Scroll to About section">
+        <span className="hero__scroll-line" aria-hidden="true"></span>
+      </a>
     </section>
   );
 };
